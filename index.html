@@ -5,6 +5,8 @@
         <link rel="stylesheet" href="main.css" type="text/css" />
         <script type="text/javascript" src="../../Winwheel.js"></script>
         <script type="text/javascript" src="../../TweenMax.min.js"></script>
+        <script src="../../sweetalert2.all.min.js"></script>
+        <link rel="stylesheet" href="../../sweetalert2.min.css">
         <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script> -->
     </head>
     <body>
@@ -16,13 +18,28 @@
                     </td>
                     <td width="438" height="582" class="the_wheel" align="center" valign="center">
                         <canvas id="canvas" width="434" height="434">
-                            <p style="{color: white}" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
+                            <p style="color: white" align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
                         </canvas>
+                    </td>
+
+                    <td style="padding: 100px;">
+                        <h1>Participants Lot</h1>
+                        <ul style="font-size: 25px;">
+                            <li class="unalloted l1">Lot 1 : </li>
+                            <li class="unalloted l2">Lot 2 : </li>
+                            <li class="unalloted l3">Lot 3 : </li>
+                            <li class="unalloted l4">Lot 5 : </li>
+                            <li class="unalloted l5">Lot 5 : </li>
+                            <li class="unalloted l6">Lot 6 : </li>
+                            <li class="unalloted l7">Lot 7 : </li>
+                        </ul>
                     </td>
                 </tr>
             </table>
         </div>
         <script>
+            let li;
+            let clickCounter = 0;
             let participants = [
                 //{'fill style' : [color], 'text': [name of participants] }
                 {'fillStyle' : '#eae56f', 'text' : 'participant 1'},
@@ -43,7 +60,7 @@
                 'animation' :           // Specify the animation to use.
                 {
                     'type'     : 'spinToStop',
-                    'duration' : 5,     // Duration in seconds.
+                    'duration' : 7,     // Duration in seconds.
                     'spins'    : 8,     // Number of complete spins.
                     'callbackFinished' : alertPrize
                 }
@@ -107,22 +124,53 @@
             // -------------------------------------------------------
             function alertPrize(indicatedSegment)
             {
+                clickCounter++;
+                let congratulatoryText;
+                //  if(clickCounter <= participants.length+1){
+                    congratulatoryText = indicatedSegment.text + " you won Lot "+ clickCounter;
+                //  }
 
+                Swal.fire({
+                    title: 'Congratulations!!!',
+                    text: congratulatoryText,
+                    // showCancelButton: true,
+                    confirmButtonText: 'Confirm',
+                    // denyButtonText: `Don't save`,
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        
+                        //Remove the recently select element fro the participants array
+                        var i = participants.map(p => p.text.indexOf(indicatedSegment.text)).findIndex(i => i >= 0);
+                        participants.splice(i,1);
 
-                //Remove the recently select element fro the participants array
-                var i = participants.map(p => p.text.indexOf(indicatedSegment.text)).findIndex(i => i >= 0);
-                participants.splice(i,1);
+                        theWheel.deleteSegment(i+1);
 
-                theWheel.deleteSegment(i+1);
+                        theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
+                        theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
+                        theWheel.draw();
+                        wheelSpinning = false;
+                        console.log(congratulatoryText);
 
+                        //add the selected participants to the list
+                        li = document.querySelector(".unalloted");
+                        if(li != null){
+                            liText = li.innerHTML;
+                            li.innerHTML = liText + indicatedSegment.text;
+                            li.classList.remove("unalloted");
+                            li.classList.add("alloted");
+                        }
 
-                // Do basic alert of the segment text. You would probably want to do something more interesting with this information.
-                console.log(indicatedSegment);
-                theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
-                theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
-                theWheel.draw();
-                wheelSpinning = false;
-                console.log("You have won " + indicatedSegment.text);
+                    } else if (result.isDenied) {
+                        // Swal.fire('Changes are not saved', '', 'info')
+                        theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
+                        theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
+                        theWheel.draw();
+                        wheelSpinning = false;
+                    }
+                });
+
+                
 
             }
         </script>
