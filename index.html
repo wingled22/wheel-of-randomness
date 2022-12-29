@@ -22,8 +22,8 @@
                         </canvas>
                     </td>
 
-                    <td style="padding: 100px;">
-                        <h1>Participants Lot</h1>
+                    <td style="padding: 100px; text-align: left;">
+                        <h2>Participants Lot</h2>
                         <ul style="font-size: 25px;">
                             <li class="unalloted l1">Lot 1 : </li>
                             <li class="unalloted l2">Lot 2 : </li>
@@ -64,6 +64,14 @@
                     'spins'    : 8,     // Number of complete spins.
                     'callbackFinished' : alertPrize
                 }
+                // ,
+                // 'pins' :                // Turn pins on.
+                // {
+                //     'number'     : participants.length,
+                //     'fillStyle'  : 'silver',
+                //     'outerRadius': 4,
+                // }
+
             });
 
             // Vars used by the code in this page to do power controls.
@@ -145,6 +153,7 @@
                         participants.splice(i,1);
 
                         theWheel.deleteSegment(i+1);
+                        // theWheel.pins.remove();
 
                         theWheel.stopAnimation(false);  // Stop the animation, false as param so does not call callback function.
                         theWheel.rotationAngle = 0;     // Re-set the wheel angle to 0 degrees.
